@@ -1,6 +1,6 @@
 const {UserModel} = require("../../model/index")
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
+const argon2 = require("argon2")
 
 /**
  * @typedef {Object} AddUserArgs
@@ -39,7 +39,7 @@ async function addUser(args){
         }
     })
 
-    const hashedPass = bcrypt.hashSync(args.password,10);
+    const hashedPass = await argon2.hash(args.password)
     if (!usernameExist) {
         if (!emailExist) {
             const result = await UserModel.create({
@@ -131,7 +131,7 @@ async function verifyUser(args) {
             "message": "User Not Found"
         }
     } else {
-        const isPasswordCorrect = bcrypt.compareSync(args.password, user.getDataValue("password"))
+        const isPasswordCorrect = await argon2.verify(user.getDataValue("password"),args.password)
         if (isPasswordCorrect) {
             const authToken = jwt.sign({"username": args.username,"password": args.password},
             process.env.JWT_SECRET_TOKEN)
