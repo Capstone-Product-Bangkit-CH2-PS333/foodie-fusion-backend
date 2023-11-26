@@ -1,6 +1,5 @@
 const {Model, DataTypes} = require('sequelize');
-const database = require("../../config/db")
-
+const database = require("../../config/database");
 /**
  * @typedef {Object} IExampleModel
  * @property {number} testId
