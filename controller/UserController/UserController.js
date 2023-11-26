@@ -12,7 +12,9 @@ const UserService = require("../../services/UserService/UserService")
  * @param {Response} res
  */
 async function login(req,res){
+    const body = req.body;
 
+    res.status(201).send(await UserService.verifyUser(body))
 }
 
 /**

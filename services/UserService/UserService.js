@@ -1,4 +1,6 @@
 const {UserModel} = require("../../model/index")
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 
 /**
  * @typedef {Object} AddUserArgs
@@ -15,6 +17,11 @@ const {UserModel} = require("../../model/index")
  * @property {string} password
  */
 
+/**
+ * @typedef {Object} UserLoginArgs
+ * @property {string} username
+ * @property {string} password
+ */
 
 
 /**@param {AddUserArgs} args */
@@ -32,13 +39,13 @@ async function addUser(args){
         }
     })
 
-    console.log(args.username);
+    const hashedPass = bcrypt.hashSync(args.password,10);
     if (!usernameExist) {
         if (!emailExist) {
             const result = await UserModel.create({
                 userId: generateUniqueId(),
                 email: args.email,
-                password: args.password,
+                password: hashedPass,
                 username: args.username,
             });
             return result;
@@ -111,6 +118,32 @@ async function updateUser(args){
 
 }
 
+/**@param {UserLoginArgs} args */
+async function verifyUser(args) {
+    const user = await UserModel.findOne({
+        where: {
+            username: args.username,
+        }
+    })
+
+    if (!user) {
+        return {
+            "message": "User Not Found"
+        }
+    } else {
+        const isPasswordCorrect = bcrypt.compareSync(args.password, user.getDataValue("password"))
+        if (isPasswordCorrect) {
+            const authToken = jwt.sign({"username": args.username,"password": args.password},
+            process.env.JWT_SECRET_TOKEN)
+
+            return {
+                "message" : "Login Success",
+                "token": authToken
+            }
+        }
+    }
+}
+
 
 function generateUniqueId() {
     // Get the current timestamp
@@ -126,11 +159,14 @@ function generateUniqueId() {
   }
 
 
+
+
 module.exports = {
     getUserByEmail,
     getUserById,
     getUserByUsername,
     updateUser,
     addUser,
+    verifyUser
 }
 
