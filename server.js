@@ -21,7 +21,9 @@ database
         console.error("Error: " + err);
     });
 
-
+app.use("/", async (req,res) => {
+    res.send({"message":"success"})
+})
 app.use("/example", exampleRouter);
 routers.forEach((router) => {
     app.use(router.prefix, router.router)
