@@ -50,15 +50,11 @@ async function addUser(args){
             });
             return result;
         } else {
-            return {
-                message: "Email has already been used"
-            }
+            throw new Error("Email has already been used")
         }
     }
     else {
-        return {
-            message: "Username Already Exists"
-        }
+        throw new Error("Username has already been used")
     }
  }
 
@@ -71,9 +67,7 @@ async function getUserById(userId){
     })
 
     if (!user) {
-        return {
-            message: "User not found"
-        }
+        throw new Error("User Not Found")
     } else {
         return user;
     }
@@ -89,9 +83,7 @@ async function getUserByEmail(email){
     })
 
     if (!user) {
-        return {
-            message: "User not found"
-        }
+        throw new Error("User Not Found")
     } else {
         return user;
     }
@@ -105,9 +97,7 @@ async function getUserByUsername(username){
     })
 
     if (!user) {
-        return {
-            message: "User not found"
-        }
+        throw new Error("User Not Found")
     } else {
         return user;
     }
@@ -115,7 +105,40 @@ async function getUserByUsername(username){
 
 /**@param {UpdateUserArgs} args */
 async function updateUser(args){
+    const userId = args.userId;
 
+    const user = await UserModel.findOne({
+        where:{
+            userId: userId,
+        }
+    })
+
+    if (!user) {
+        throw new Error("User not Found");
+    }
+
+    const updatedUser = await UserModel.upsert(args);
+    return updatedUser;
+}
+
+async function deleteUser(userId){
+    const user = await UserModel.findOne({
+        where:{
+            userId: userId,
+        }
+    })
+
+    if (!user) {
+        throw new Error("User not Found");
+    }
+
+    const deletedUser = await UserModel.destroy({
+        where: {
+            userId: userId
+        }
+    })
+
+    return null;
 }
 
 /**@param {UserLoginArgs} args */
@@ -127,9 +150,7 @@ async function verifyUser(args) {
     })
 
     if (!user) {
-        return {
-            "message": "User Not Found"
-        }
+        throw new Error("User not Found")
     } else {
         const isPasswordCorrect = await argon2.verify(user.getDataValue("password"),args.password)
         if (isPasswordCorrect) {
@@ -166,6 +187,7 @@ module.exports = {
     getUserById,
     getUserByUsername,
     updateUser,
+    deleteUser,
     addUser,
     verifyUser
 }
