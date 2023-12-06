@@ -1,5 +1,8 @@
 const {Model, DataTypes} = require("sequelize");
-const database = require("../../config/database")
+const database = require("../../config/database");
+const UserEventsModel = require("./UserEventsModel");
+const HangoutModel = require("../HangoutModel/HangoutModel");
+const UserFriendModel = require("./UserFriendsModel");
 
 /**
  * @typedef {Object} IUserModel
@@ -7,6 +10,9 @@ const database = require("../../config/database")
  * @property {string} username
  * @property {string} email
  * @property {string} password
+ * @property {string} phoneNo
+ * @property {string} photoURL
+ * @property {boolean} isPrivate
  */
 
 /**@extends Model<IUserModel> */
@@ -30,6 +36,18 @@ UserModel.init(
         password: {
             type: DataTypes.STRING,
             field: "password",
+        },
+        photoURL: {
+            type :DataTypes.STRING,
+            field: "photo_url",
+        },
+        phoneNo: {
+            type: DataTypes.STRING,
+            field: "phone_no"
+        },
+        private: {
+            type: DataTypes.BOOLEAN,
+            field: "is_private"
         }
     },
     {
@@ -41,5 +59,13 @@ UserModel.init(
     }
 
 )
+
+UserModel.belongsToMany(HangoutModel, {through: UserEventsModel})
+UserModel.belongsToMany(UserModel, {
+    through: UserFriendModel, 
+    as:"Friends",
+    foreignKey: "userId",    // Specify the foreign key in UserFriendModel that refers to the source UserModel
+    otherKey: "friendId",
+})
 
 module.exports = UserModel;
