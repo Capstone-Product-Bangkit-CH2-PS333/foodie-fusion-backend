@@ -1,6 +1,7 @@
 const {UserModel} = require("../../model/index")
 const jwt = require("jsonwebtoken")
 const argon2 = require("argon2")
+const UserFriendModel = require("../../model/UserModel/UserFriendsModel")
 
 /**
  * @typedef {Object} AddUserArgs
@@ -21,6 +22,12 @@ const argon2 = require("argon2")
  * @typedef {Object} UserLoginArgs
  * @property {string} username
  * @property {string} password
+ */
+
+/**
+ * @typedef {Object} AddFriendArgs
+ * @property {string} userId;
+ * @property {string} friendId;
  */
 
 
@@ -165,6 +172,69 @@ async function verifyUser(args) {
     }
 }
 
+async function getAllFriends(userId){
+    const user = await UserModel.findOne({
+        where: {
+            userId: userId,
+        },
+        include: {
+            model: UserModel,
+            as: "Friends",
+            through: UserFriendModel,
+        }
+    })
+
+    if (!user) {
+        throw new Error("User Not Found")
+    }
+
+    const friends = user.Friends;
+
+    const result = friends.map((friend) => {
+        return {
+            "userId": friend.getDataValue("userId"),
+            "username": friend.getDataValue("username"),
+        }
+    })
+
+    return result;
+}
+
+async function isUserPrivate(userId){
+    const user = await UserModel.findOne({
+        where: {
+            userId: userId
+        }
+    })
+
+    const private = user.getDataValue("isPrivate");
+    return private;
+}
+
+/**@param {AddFriendArgs} args */
+async function addFriendRequest(args){
+    const targetFriend = await UserModel.findOne({
+        where: {
+            userId: args.friendId
+        }
+    })
+
+    if (!targetFriend) {
+        throw new Error("User Not Found")
+    }
+
+    const userPrivate = await isUserPrivate(targetFriend.getDataValue("userId"));
+    if (userPrivate) {
+
+    } else {
+        
+    }
+}
+
+async function handleFriendRequest(accept){
+
+}
+
 
 function generateUniqueId() {
     // Get the current timestamp
@@ -189,6 +259,7 @@ module.exports = {
     updateUser,
     deleteUser,
     addUser,
-    verifyUser
+    verifyUser,
+    getAllFriends,
 }
 

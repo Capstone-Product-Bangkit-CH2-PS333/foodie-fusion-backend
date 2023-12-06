@@ -77,9 +77,27 @@ async function deleteUser(req,res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getUserFriends(req,res){
+    try {
+        const userId = req.params.userId;
+        const friends = await UserService.getAllFriends(userId);
+
+        res.status(200).send(friends);
+    }catch (error) {
+        res.status(400).send({
+            "message":error.message,
+        })
+    }
+}
+
 module.exports = {
     login,
     register,
     updateUser,
     deleteUser,
+    getUserFriends
 }
