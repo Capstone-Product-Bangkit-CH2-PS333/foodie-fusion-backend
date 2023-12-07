@@ -161,7 +161,9 @@ async function verifyUser(args) {
     } else {
         const isPasswordCorrect = await argon2.verify(user.getDataValue("password"),args.password)
         if (isPasswordCorrect) {
-            const authToken = jwt.sign({"username": args.username,"password": args.password},
+            const authToken = jwt.sign({"userId": user.getDataValue("userId"),
+                                        "username": args.username,
+                                        "password": args.password},
             process.env.JWT_SECRET_TOKEN)
 
             return {

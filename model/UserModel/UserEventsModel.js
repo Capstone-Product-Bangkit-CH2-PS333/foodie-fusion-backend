@@ -14,10 +14,12 @@ UserEventsModel.init(
     {
         userId: {
             type: DataTypes.STRING,
+            field: "user_id",
             primaryKey: true,
         },
         eventId: {
             type: DataTypes.STRING,
+            field: "event_id",
             primaryKey: true,
         }
     },

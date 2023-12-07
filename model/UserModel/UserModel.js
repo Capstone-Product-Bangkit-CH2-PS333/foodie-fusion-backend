@@ -60,7 +60,11 @@ UserModel.init(
 
 )
 
-UserModel.belongsToMany(HangoutModel, {through: UserEventsModel})
+UserModel.belongsToMany(HangoutModel, {
+    through: UserEventsModel,
+    foreignKey: "userId",
+    otherKey: "eventId"
+})
 UserModel.belongsToMany(UserModel, {
     through: UserFriendModel, 
     as:"Friends",
