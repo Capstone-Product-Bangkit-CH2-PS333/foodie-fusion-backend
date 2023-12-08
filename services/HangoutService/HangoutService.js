@@ -8,6 +8,7 @@ const UserService = require("../UserService/UserService")
  * @property {string} userId
  * @property {string} title
  * @property {string} description
+ * @property {stirng} location
  * @property {string} imageURL
  * @property {number} estimatedOutput 
  */
@@ -25,19 +26,18 @@ const UserService = require("../UserService/UserService")
 
 /**@param {AddHangoutArgs} args */
 async function publishHangout(args){
-    const eventId = generateUniqueId();
 
     const hangout = await HangoutModel.create({
-        eventId: eventId,
         title: args.title,
         description: args.description,
+        location: args.location,
         imageURL: args.imageURL,
         estimatedOutput: args.estimatedOutput,
     })
 
     await UserEventsModel.create({
         userId: args.userId,
-        eventId: eventId,
+        eventId: hangout.getDataValue("eventId"),
     })
 
     return hangout;
@@ -136,13 +136,23 @@ async function getHangoutDetails(args){
         }
     })
 
+    let joined;
+
     if (!userHasJoined) {
-        event['joined'] = false;
+        joined = false
     } else {
-        event['joined'] = true;
+        joined = true;
     }
 
-    return event;
+    return {
+        eventId: event.getDataValue("eventId"),
+        title: event.getDataValue("title"),
+        description: event.getDataValue("description"),
+        imageURL: event.getDataValue("imageURL"),
+        estimatedOutput: event.getDataValue("estimatedOutput"),
+        location: event.getDataValue("location"),
+        joined: joined,
+    };
 }
 
 function generateUniqueId() {

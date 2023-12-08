@@ -6,6 +6,8 @@ const { authenticateUserToken } = require("../../middleware/auth");
 
 router.get("/:hangoutId",authenticateUserToken,HangoutController.getHangoutById)
 router.get("/",authenticateUserToken,HangoutController.getAvailableHangouts)
+router.post("/",authenticateUserToken,HangoutController.createHangout)
+router.put("/:hangoutId",authenticateUserToken,HangoutController.joinHangout)
 
 module.exports = router;
 

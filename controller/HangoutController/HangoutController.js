@@ -25,7 +25,10 @@ async function getHangoutById(req,res){
         })
     }
 }
-
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
 async function getAvailableHangouts(req,res) {
     try {
         const userId = req.userId;
@@ -38,8 +41,53 @@ async function getAvailableHangouts(req,res) {
         })
     }
 }
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function createHangout(req,res){
+    try {
+        const userId = req.userId;
+        const body = req.body;
+
+        res.status(200).send(await HangoutService.publishHangout({
+            userId: userId,
+            title: body.title,
+            description: body.description,
+            estimatedOutput: body.estimatedOutput,
+            location: body.location,
+            imageURL: body.imageURL,
+        }))
+    } catch(error) {
+        res.status(400).send({
+            "message": error.message,
+        })
+    }
+}
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function joinHangout(req,res){
+    try{
+        const userId = req.userId;
+        const hangoutId = req.params.hangoutId;
+
+        res.status(200).send(await HangoutService.joinHangout({
+            userId: userId,
+            hangoutId: hangoutId,
+        }))
+    } catch(error) {
+        res.status(400).send({
+            "message": error.message,
+        })
+    }
+}
 
 module.exports =  {
     getAvailableHangouts,
-    getHangoutById
+    getHangoutById,
+    createHangout,
+    joinHangout
 }

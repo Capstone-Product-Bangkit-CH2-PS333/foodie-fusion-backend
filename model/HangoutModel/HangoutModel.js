@@ -19,7 +19,8 @@ class HangoutModel extends Model{}
 HangoutModel.init(
     {
         eventId: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true,
             allowNull: false,
             field: "event_id"
