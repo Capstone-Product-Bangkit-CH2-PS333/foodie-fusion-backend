@@ -121,6 +121,7 @@ jobs:
             DB_HOST=${{ secrets.DB_HOST }}
             DB_NAME=${{ secrets.DB_NAME }}
             JWT_SECRET_TOKEN=${{ secrets.JWT_SECRET_TOKEN }}
+            GCS_SERVICE_ACCOUNT=${{ secrets.GCS_SA_KEY_JSON}}
             BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME}}
 
       # If required, use the Cloud Run url output in later steps
