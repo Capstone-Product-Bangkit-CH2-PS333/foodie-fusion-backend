@@ -28,26 +28,34 @@ UserModel.init(
         username: {
             type: DataTypes.STRING,
             field: "username",
+            allowNull: true,
         },
         email: {
             type: DataTypes.STRING,
-            field: "email"
+            field: "email",
+            allowNull:true,
         },
         password: {
             type: DataTypes.STRING,
             field: "password",
+            allowNull:true,
+
         },
         photoURL: {
             type :DataTypes.STRING,
             field: "photo_url",
+            allowNull:true,
+
         },
         phoneNo: {
             type: DataTypes.STRING,
-            field: "phone_no"
+            field: "phone_no",
+            allowNull:true,
         },
         private: {
             type: DataTypes.BOOLEAN,
-            field: "is_private"
+            field: "is_private",
+            allowNull:true,
         }
     },
     {

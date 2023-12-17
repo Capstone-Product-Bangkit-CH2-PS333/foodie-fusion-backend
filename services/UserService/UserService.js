@@ -16,6 +16,9 @@ const UserFriendModel = require("../../model/UserModel/UserFriendsModel")
  * @property {string} username
  * @property {string} email
  * @property {string} password
+ * @property {string} photoURL
+ * @property {string} phoneNo
+ * @property {boolean} private
  */
 
 /**
@@ -103,17 +106,13 @@ async function getUserByUsername(username){
         }
     })
 
-    if (!user) {
-        throw new Error("User Not Found")
-    } else {
-        return user;
-    }
+    return user;
 }
 
 /**@param {UpdateUserArgs} args */
 async function updateUser(args){
     const userId = args.userId;
-
+    console.log(args);
     const user = await UserModel.findOne({
         where:{
             userId: userId,
@@ -124,8 +123,17 @@ async function updateUser(args){
         throw new Error("User not Found");
     }
 
-    const updatedUser = await UserModel.upsert(args);
-    return updatedUser;
+    if (args.username){
+        console.log("Checking Username");
+        const usernameExist = await getUserByUsername(args.username);
+
+        if (usernameExist) {
+            throw new Error("Username already Exists");
+        }
+    }
+    const updatedUser = await UserModel.upsert(JSON.parse(JSON.stringify(args)));
+
+    return args;
 }
 
 async function deleteUser(userId){
