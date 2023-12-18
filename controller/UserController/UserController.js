@@ -80,7 +80,7 @@ async function updateUser(req,res){
                 try {
                     // Make the file public
                     fileURL = publicUrl;
-                    res.status(204).send(await UserService.updateUser({
+                    const result = await UserService.updateUser({
                         userId: userId,
                         username: body.username,
                         password: body.password,
@@ -88,7 +88,9 @@ async function updateUser(req,res){
                         phoneNo: body.phoneNo,
                         photoURL: publicUrl,
                         private: body.private,
-                    }))
+                    })
+                    console.log(result);
+                    res.status(200).send(result)
                 } catch {
                     return res.status(500).send({
                         message:
@@ -100,7 +102,7 @@ async function updateUser(req,res){
             });
             blobStream.end(req.file.buffer);
         } else {
-            res.status(204).send(await UserService.updateUser({
+            res.status(200).send(await UserService.updateUser({
                 userId: userId,
                 username: body.username,
                 password: body.password,
@@ -149,10 +151,28 @@ async function getUserFriends(req,res){
     }
 }
 
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getUserbyId(req,res) {
+    try {
+        const userId = req.params.userId;
+
+        res.status(200).send(await UserService.getUserById(userId));
+    } catch (error) {
+        res.status(400).send({
+            "message":error.message,
+        })
+    }
+}
+
 module.exports = {
     login,
     register,
     updateUser,
     deleteUser,
+    getUserbyId,
     getUserFriends
 }

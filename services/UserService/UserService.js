@@ -112,7 +112,6 @@ async function getUserByUsername(username){
 /**@param {UpdateUserArgs} args */
 async function updateUser(args){
     const userId = args.userId;
-    console.log(args);
     const user = await UserModel.findOne({
         where:{
             userId: userId,
@@ -124,16 +123,23 @@ async function updateUser(args){
     }
 
     if (args.username){
-        console.log("Checking Username");
         const usernameExist = await getUserByUsername(args.username);
 
         if (usernameExist) {
             throw new Error("Username already Exists");
         }
     }
-    const updatedUser = await UserModel.upsert(JSON.parse(JSON.stringify(args)));
+    await UserModel.upsert(JSON.parse(JSON.stringify(args)));
+    const updatedUser = await getUserById(userId)
 
-    return args;
+    return {
+        "userId": updatedUser.getDataValue("userId"),
+        "username": updatedUser.getDataValue("email"),
+        "email": updatedUser.getDataValue("email"),
+        "photoURL": updatedUser.getDataValue("photoURL"),
+        "phoneNo": updatedUser.getDataValue("phoneNo"),
+        "isPrivate": updatedUser.getDataValue("isPrivate")
+    };
 }
 
 async function deleteUser(userId){
