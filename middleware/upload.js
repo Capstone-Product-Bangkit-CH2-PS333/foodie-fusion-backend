@@ -7,7 +7,7 @@ const upload = multer({
 }).single('file');
 
 const storage = new Storage({
-    keyFilename:"backend-capstone-406208-c6bed76849f3.json",
+    keyFilename:process.env.GCS_SERVICE_ACCOUNT,
 })
 
 const bucketName = process.env.BUCKET_NAME
