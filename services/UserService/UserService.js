@@ -37,7 +37,6 @@ const UserFriendModel = require("../../model/UserModel/UserFriendsModel")
 /**@param {AddUserArgs} args */
 async function addUser(args){
     // TODO: DO validity checks for email, passowrd, and username
-
     const usernameExist = await UserModel.findOne({
         where: {
             username: args.username,
@@ -53,7 +52,6 @@ async function addUser(args){
     if (!usernameExist) {
         if (!emailExist) {
             const result = await UserModel.create({
-                userId: generateUniqueId(),
                 email: args.email,
                 password: hashedPass,
                 username: args.username,
@@ -122,7 +120,7 @@ async function updateUser(args){
         throw new Error("User not Found");
     }
 
-    if (args.username){
+    if (args.username && args.username != user.getDataValue("username")){
         const usernameExist = await getUserByUsername(args.username);
 
         if (usernameExist) {

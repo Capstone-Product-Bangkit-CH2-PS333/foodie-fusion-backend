@@ -23,7 +23,8 @@ UserModel.init(
         userId: {
             type: DataTypes.STRING,
             field: "user_id",
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement:true,
         },
         username: {
             type: DataTypes.STRING,
@@ -70,6 +71,7 @@ UserModel.init(
 
 UserModel.belongsToMany(HangoutModel, {
     through: UserEventsModel,
+    as: "Events",
     foreignKey: "userId",
     otherKey: "eventId"
 })

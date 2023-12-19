@@ -40,6 +40,7 @@ async function register(req,res){
             email: body.email,
         }));
     } catch (error) {
+        console.log(error.message);
         res.status(400).send({
             "message": error.message,
         })
