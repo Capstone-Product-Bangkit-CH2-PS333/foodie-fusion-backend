@@ -20,9 +20,13 @@ const UserService = require("../UserService/UserService")
 
 /**
  * @typedef {Object} updateHangoutArgs
- * @property {string} eventId
+ * @property {number} eventId
+ * @property {string} title
+ * @property {string} description
+ * @property {string} imageURL
+ * @property {string} location
+ * @property {string} estimatedOutput
  */
-
 
 /**@param {AddHangoutArgs} args */
 async function publishHangout(args){
@@ -41,6 +45,64 @@ async function publishHangout(args){
     })
 
     return hangout;
+}
+
+/**@param {updateHangoutArgs} args */
+async function updateHangoutInfo(args){
+    const hangoutId = args.eventId;
+
+    const event = await HangoutModel.findOne({
+        where: {
+            eventId: hangoutId,
+        }
+    })
+
+    if (!event) {
+        throw new Error("Event Not Found")
+    }
+
+    await HangoutModel.upsert(JSON.parse(JSON.stringify(args)))
+
+    const updatedEvent = await HangoutModel.findOne({
+        where :{
+            eventId: hangoutId
+        }
+    })
+
+    return {
+        eventId: updatedEvent.getDataValue("eventId"),
+        title: updatedEvent.getDataValue("title"),
+        description: updatedEvent.getDataValue("description"),
+        imageURL: updatedEvent.getDataValue("imageURL"),
+        location: updatedEvent.getDataValue("location"),
+        estimatedOutput: updatedEvent.getDataValue("estimatedOutput")
+    }
+}
+
+/**@param {string} hangoutId */
+async function getHangoutMembers(hangoutId){
+    const hangout = await HangoutModel.findOne({
+        where:{
+            eventId: hangoutId,
+        },
+        include: {
+            model: UserModel,
+            as: "Members",
+            through: UserEventsModel
+        }
+    })
+
+    const members = hangout.Members;
+
+    const result = members.map((member) => {
+        return {
+            userId: member.getDataValue("userId"),
+            username: member.getDataValue("username"),
+            photoURL: member.getDataValue("photoURL"),
+        }
+    })
+
+    return result;
 }
 
 /**@param {JoinHangoutArgs} args */
@@ -74,7 +136,7 @@ async function getUserHangout(userId){
         include: {
             model: HangoutModel,
             through: UserEventsModel,
-            as: "Hangouts",
+            as: "Events",
         }
     })
 
@@ -94,17 +156,27 @@ async function getHangoutAvailable(userId){
 
     const friends = await UserService.getAllFriends(userId);
 
-    let hangouts = [];
 
-    await Promise.all(friends.forEach(async (friend) => {
-        const hangoutList = await getUserHangout(friend.userId);
+    const hangouts = await Promise.all(friends.map(async (friend) => {
+        const friendsHangout = await getUserHangout(friend.userId);
 
-        hangoutList.forEach((hangout) => {
-            hangouts.push(hangout.getDataValue("Hangouts"));
+        const hangoutList = friendsHangout["Events"];
+
+        const tempList = hangoutList.map((hangout) => {
+            return {
+                eventId: hangout.getDataValue("eventId"),
+                title: hangout.getDataValue("title"),
+                description: hangout.getDataValue("description"),
+                location: hangout.getDataValue("location")
+            }
         })
+
+        return tempList;
     }));
 
-    return hangouts;
+    const result = [].concat(...hangouts);
+
+    return result;
 }
 
 /**@param {JoinHangoutArgs} args*/
@@ -154,24 +226,12 @@ async function getHangoutDetails(args){
         joined: joined,
     };
 }
-
-function generateUniqueId() {
-    // Get the current timestamp
-    const timestamp = new Date().getTime();
-  
-    // Generate a random number (you can use a more sophisticated method if needed)
-    const random = Math.floor(Math.random() * 10000);
-  
-    // Concatenate timestamp and random number to create a unique ID
-    const uniqueId = `${timestamp}${random}`;
-  
-    return "ev_" + uniqueId;
-  }
-
 module.exports = {
     publishHangout,
     joinHangout,
     getHangoutAvailable,
     getHangoutDetails,
     getUserHangout,
+    getHangoutMembers,
+    updateHangoutInfo,
 }

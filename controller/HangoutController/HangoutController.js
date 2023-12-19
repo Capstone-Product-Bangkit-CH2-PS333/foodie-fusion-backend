@@ -85,9 +85,49 @@ async function joinHangout(req,res){
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getHangoutMembers(req,res){
+    try {
+        const hangoutId = req.params.hangoutId;
+        res.status(200).send(await HangoutService.getHangoutMembers(hangoutId))
+    } catch(error) {
+        res.status(400).send({
+            "message": error.message,
+        })
+    }
+}
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function updateHangout(req,res){
+    try {
+        const hangoutId= req.params.hangoutId;
+        const body = req.body;
+        res.status(200).send(await HangoutService.updateHangoutInfo({
+            eventId: body.eventId,
+            title: body.title,
+            description: body.description,
+            location: body.location,
+            estimatedOutput: body.estimatedOutput,
+            
+        }))
+    }catch(error) {
+        res.status(400).send({
+            "message": error.message,
+        })
+    }
+}
+
 module.exports =  {
     getAvailableHangouts,
     getHangoutById,
     createHangout,
-    joinHangout
+    joinHangout,
+    getHangoutMembers,
+    updateHangout,
 }
