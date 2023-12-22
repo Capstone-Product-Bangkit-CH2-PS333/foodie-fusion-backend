@@ -180,6 +180,8 @@ async function verifyUser(args) {
 
             return {
                 "message" : "Login Success",
+                "username": user.getDataValue("username"),
+                "email": user.getDataValue("email"),
                 "token": authToken
             }
         }
