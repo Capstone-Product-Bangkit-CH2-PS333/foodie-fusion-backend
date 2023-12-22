@@ -169,11 +169,27 @@ async function getUserbyId(req,res) {
     }
 }
 
+/**
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getFriendRecommendations(req,res){
+    try {
+        const userId = req.params.userId;
+        res.status(200).send(await UserService.getFriendRecommendations(userId));
+    }catch (error) {
+        res.status(400).send({
+            "message":error.message,
+        })
+    }
+}
+
 module.exports = {
     login,
     register,
     updateUser,
     deleteUser,
     getUserbyId,
-    getUserFriends
+    getUserFriends,
+    getFriendRecommendations
 }

@@ -2,6 +2,8 @@ const {UserModel} = require("../../model/index")
 const jwt = require("jsonwebtoken")
 const argon2 = require("argon2")
 const UserFriendModel = require("../../model/UserModel/UserFriendsModel")
+const { default: axios } = require("axios")
+const FormData = require("form-data")
 
 /**
  * @typedef {Object} AddUserArgs
@@ -188,6 +190,36 @@ async function verifyUser(args) {
     }
 }
 
+async function getFriendRecommendations(userId){
+    const user = await UserModel.findOne({
+        where: {
+            userId: userId
+        }
+    })
+
+    if (!user) {
+        throw new Error("User not Found")
+    }
+
+    const url = 'https://ml-service-4unnqhcxkq-uc.a.run.app/api/v1/friend-recommendation'
+    const formData = new FormData();
+    formData.append("user",userId)
+    const modelPredict = await axios.post(url,formData, {headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    const recommendation = modelPredict.data['recommendation'];
+
+    const result = recommendation.map((rec) => {
+        return rec[0]
+    })
+    return {
+        userId: userId,
+        reccomendations: result
+    }
+}
+
 async function getAllFriends(userId){
     const user = await UserModel.findOne({
         where: {
@@ -277,5 +309,6 @@ module.exports = {
     addUser,
     verifyUser,
     getAllFriends,
+    getFriendRecommendations
 }
 

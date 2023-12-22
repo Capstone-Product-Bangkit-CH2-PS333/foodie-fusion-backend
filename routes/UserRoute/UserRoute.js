@@ -10,5 +10,6 @@ router.delete("/:userId",authenticateUserToken,UserController.deleteUser)
 router.put("/:userId",authenticateUserToken,upload,UserController.updateUser)
 router.get("/friends/:userId",authenticateUserToken,UserController.getUserFriends);
 router.get("/:userId",authenticateUserToken, UserController.getUserbyId)
+router.get("/friends/recommendation/:userId",authenticateUserToken,UserController.getFriendRecommendations)
 
 module.exports = router;
