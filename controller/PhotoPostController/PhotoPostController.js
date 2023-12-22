@@ -59,6 +59,9 @@ async function publishPhotoPost(req,res){
                         caption: body.caption,
                         location: body.location,
                         imageURL: publicUrl,
+                        buffer: req.file.buffer,
+                        originalname: req.file.originalname,
+                        blob: blob
                     })
                     res.status(200).send(result)
                 } catch {

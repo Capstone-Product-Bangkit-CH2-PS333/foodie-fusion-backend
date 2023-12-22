@@ -3,9 +3,12 @@
  * @property {string} caption
  * @property {string} imageURL
  * @property {string} location
+ * @property {file} file
  */
 
+const FormData = require("form-data");
 const PhotoPostModel = require("../../model/PhotoPostModel/PhotoPostModel");
+const axios = require("axios").default
 
 
 async function getAllPhotoLabels(){
@@ -83,11 +86,25 @@ async function getPhotoPostDetail(photoPostId){
 /**@param {PublishPhotoArgs} args */
 async function publishPhotoPost(args){
 
-    const label = "HIT ML SERVICE";
-    const data = args;
-    data['label'] =label;
+    const url = 'https://ml-service-4unnqhcxkq-uc.a.run.app/api/v1/food-image-prediction'
 
-    const photoPost = await PhotoPostModel.create(args);
+    const formData = new FormData();
+
+    formData.append('file',args.buffer,{filename: args.originalname})
+
+    
+    const labelPrediction = await axios.post(url,formData, {headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    console.log(labelPrediction['data']['food_name'])
+    const photoPost = await PhotoPostModel.create({
+        caption: args.caption,
+        label: labelPrediction['data']['food_name'],
+        location: args.location,
+        imageURL: args.imageURL
+    });
 
     return photoPost;
     
