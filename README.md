@@ -1,13 +1,11 @@
 # foodie-fusion-backend
-# Tucil3_13520143
 13520143 - Muhammad Gerald Akbar Giffera
 
 <br>
 
 ## Table of Contents
-- [Deskripsi Program](#desc)
-- [Requirements](#req)
-- [Cara Menggunakan Program](#use)
+- [Program Description](#desc)
+- [Infrastructure Description](#req)
 
 ## Program Description<a name = "desc"></a>
 This is a backend service for our foodie-fusion application, built on express.js framwork. Other libraries used are the following:
