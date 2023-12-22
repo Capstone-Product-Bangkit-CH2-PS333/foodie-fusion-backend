@@ -1,6 +1,4 @@
 # foodie-fusion-backend
-13520143 - Muhammad Gerald Akbar Giffera
-
 <br>
 
 ## Table of Contents
